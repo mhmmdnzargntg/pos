@@ -40,5 +40,6 @@ class StoreRequest extends FormRequest
         'password.required' => 'Password wajib diisi.',
         'password.min' => 'Password minimal :min karakter.',
         'role_id.required' => 'Roles Wajib diisi.',
-    ];
+        ];
+    }
 }

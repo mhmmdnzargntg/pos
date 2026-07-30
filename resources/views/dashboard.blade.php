@@ -11,7 +11,7 @@
         <div class="col-md-12">
             <h1>Ringkasan Hari Ini
                 <small class="text-muted">
-                    ({{ $tanggalHariIni->translatedFormat('1, d F Y')}})
+                    ({{ $tanggalHariIni->translatedFormat(' d F Y')}})
                 </small>
             </h1>
         </div>
