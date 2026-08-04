@@ -5,7 +5,7 @@
 @section('content')
 <h1>Tambah Produk</h1>
 
-<form action="{{ route('admin.produk.store') }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('produk.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
     @include('Produk._form')
 </form>

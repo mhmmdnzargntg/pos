@@ -7,10 +7,11 @@
 @include('layouts.navbar')
 
 <h1>Halaman Produk</h1>
+@can('create', App\Models\Produk::class)
+<a href="{{ route('produk.create') }}" method="GET" class="btn btn-primary mb-3">Create</a>
+@endcan
 
-<a href="{{ route('admin.produk.create') }}" method="GET" class="btn btn-primary mb-3">Create</a>
-
-    <form action="{{ route('admin.produk.index') }}" method="GET" class="mb-3">
+    <form action="{{ route('produk.index') }}" method="GET" class="mb-3">
         <div class="input-group">
             <input 
                 type="text"
@@ -52,17 +53,21 @@
         <td>{{ $item->harga_jual }}</td>
         <td>{{ $item->stok }}</td>
         <td>
-            <a href="{{ route('admin.produk.edit', $item) }}" class="btn btn-warning">Edit</a>
+        @can('update', $item)
+            <a href="{{ route('produk.edit', $item) }}" class="btn btn-warning">Edit</a>
+             @endcan
             ||
-            <form action="" method="" class="d-inline">
+            @can('delete', $item)
+            <form action="{{ route('produk.destroy', $item) }}" method="POST" class="d-inline">
                 @csrf
                 @method('DELETE')
                 <button class="btn btn-danger" onclick="return confirm('Apakah anda yakin menghapus user ini?')">
                     Hapus
                 </button>
             </form>
-        </td>
-    </tr>
+        @endcan
+    </td>
+</tr>
     @empty
         <tr>
             <td collspan=8><h1>Data tidak tersedia.</h1></td>

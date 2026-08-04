@@ -12,23 +12,23 @@ use Illuminate\Support\Facades\Storage;
 
 class ProdukController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index(SearchRequest $request)
     {
+        $this->authorize('viewAny', Produk::class);
+
         $keyword = $request->input('search');
 
-          if($keyword) {
-            $products = Produk::when($keyword, function ($query) use ($keyword)  {
+        if ($keyword) {
+            $products = Produk::when($keyword, function ($query) use ($keyword) {
                 $query->where('nama', 'like', '%' . $keyword . '%');
             })
-            ->orderBy('nama')
-            ->paginate(10)
-            ->withQueryString();
-          } else {
+                ->orderBy('nama')
+                ->paginate(10)
+                ->withQueryString();
+        } else {
             $products = Produk::latest()->paginate(10)->withQueryString();
-          }
+        }
 
         return view('produk.index', compact('products'));
     }
@@ -38,6 +38,8 @@ class ProdukController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Produk::class);
+
         return view('produk.create');
     }
 
@@ -46,6 +48,8 @@ class ProdukController extends Controller
      */
     public function store(StoreRequest $request)
     {
+        $this->authorize('create', Produk::class);
+
         $dataReq = $request->validated();
 
         $data['user_id'] = Auth::id();
@@ -54,13 +58,13 @@ class ProdukController extends Controller
         $data['harga_jual'] = $dataReq['selling_price'];
         $data['stok'] = $dataReq['stock'] ?? true;
 
-if ($request->hasFile('foto')) {
-    $data['foto'] = $request->file('foto')->store('products', 'public');
-}
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->file('foto')->store('products', 'public');
+        }
 
-Produk::create($data);
+        Produk::create($data);
 
-return redirect()->route('admin.produk.index')->with('success', 'Product created successfully.');
+        return redirect()->route('produk.index')->with('success', 'Product created successfully.');
     }
 
     /**
@@ -76,6 +80,8 @@ return redirect()->route('admin.produk.index')->with('success', 'Product created
      */
     public function edit(Produk $produk)
     {
+        $this->authorize('view', $produk);
+
         return view('produk.edit', compact('produk'));
     }
 
@@ -84,6 +90,7 @@ return redirect()->route('admin.produk.index')->with('success', 'Product created
      */
     public function update(UpdateRequest $request, Produk $produk)
     {
+        $this->authorize('update', $produk);
         $dataReq  = $request->validated();
 
         $data = [
@@ -94,28 +101,36 @@ return redirect()->route('admin.produk.index')->with('success', 'Product created
             'stok'      => $dataReq['stock'],
         ];
 
-    //jika upload foto baru
-    if ($request->hasFile('foto')) {
+        //jika upload foto baru
+        if ($request->hasFile('foto')) {
 
-        if (
-            $produk->foto &&
-            Storage::disk('public')->exists($produk->foto)
-        ) {
-            Storage::disk('public')->delete($produk->foto);
+            if (
+                $produk->foto &&
+                Storage::disk('public')->exists($produk->foto)
+            ) {
+                Storage::disk('public')->delete($produk->foto);
+            }
+            $data['foto'] = $request->file('foto')->store('products', 'public');
         }
-        $data['foto'] = $request->file('foto')->store('products', 'public');
-    }
 
         $produk->update($data);
 
-        return redirect()->route('admin.users.edit', $produk->id)->with('success', 'Product updated successfully.');
+        return redirect()->route('produk.edit', $produk->id)->with('success', 'Product updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Produk $produk)
     {
-        //
+        $this->authorize('delete', $produk);
+
+        if ($produk->foto) {
+            Storage::disk('public')->delete($produk->foto);
+        }
+
+        $produk->delete();
+
+        return redirect()->route('produk.index')->with('success', 'Product berhasil dihapus.');
     }
 }
