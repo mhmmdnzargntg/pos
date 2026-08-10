@@ -2,21 +2,36 @@
 
 namespace App\Providers;
 
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider AS ServiceProvider;
-use Illuminate\Pagination\Paginator;
 use Carbon\Carbon;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\ServiceProvider;
+
 use App\Models\User;
-use App\Policies\Dashboardpolicy;
 use App\Models\Produk;
-use App\Policies\Produkpolicy;
+use App\Models\Penjualan;
+use App\Models\ItemPenjualan;
+use App\Policies\DashboardPolicy;
+use App\Policies\ProdukPolicy;
+use App\Policies\PenjualanPolicy; // ✅ Ditambahkan
+use App\Policies\ItemPenjualanPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * The policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
     protected $policies = [
-        User::class => Dashboardpolicy::class,
-        Produk::class => Produkpolicy::class,
+        User::class => DashboardPolicy::class,
+        Produk::class => ProdukPolicy::class,
+        Penjualan::class => PenjualanPolicy::class, // ✅ Ditambahkan
+        ItemPenjualan::class => ItemPenjualanPolicy::class,
     ];
 
+    /**
+     * Register any application services.
+     */
     public function register(): void
     {
         //

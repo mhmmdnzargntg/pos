@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ItemPenjualan;
+use App\Models\itemPenjualan as ModelsItemPenjualan;
 use App\Models\Penjualan;
 use App\Models\Produk;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,7 @@ class ItemPenjualanController extends Controller
     {
         //
     }
-
+    
     /**
      * Show the form for creating a new resource.
      */
@@ -122,8 +123,24 @@ public function store(Request $request)
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(itemPenjualan $itempenjualan)
     {
-        //
+        $this->authorize('delete', $itempenjualan);
+
+        DB::transaction(function () use ($itempenjualan) {
+
+            $produk = $itempenjualan->produk;
+            $sale = $itempenjualan->penjualan;
+
+            $produk->increment('stok', $itempenjualan->kuantitas);
+
+            $itempenjualan->delete();
+
+            $sale->update([
+                'total_pembayaran' => $sale->$itempenjualan()->sum('subtotal')
+            ]);
+        });
+
+            return back();
     }
 }

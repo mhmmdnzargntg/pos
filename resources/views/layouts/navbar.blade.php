@@ -18,6 +18,9 @@
         <li class="nav-item">
           <a class="nav-link {{ Request::is('produk*') ? 'active' : '' }}" href="{{ route('produk.index') }}">Produk</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link {{ Request::is('penjualan') ? : '' }}" href="{{ route('penjualan.index')  }}">Penjualan</a>
+        </li>
 
       </ul>
       <form action="{{ route('logout') }}" method="POST" class="d-flex">
