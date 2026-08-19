@@ -5,6 +5,7 @@ namespace App\Providers;
 use Carbon\Carbon;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate; // 1. Wajib di-import
 
 use App\Models\User;
 use App\Models\Produk;
@@ -12,7 +13,7 @@ use App\Models\Penjualan;
 use App\Models\ItemPenjualan;
 use App\Policies\DashboardPolicy;
 use App\Policies\ProdukPolicy;
-use App\Policies\PenjualanPolicy; // ✅ Ditambahkan
+use App\Policies\PenjualanPolicy;
 use App\Policies\ItemPenjualanPolicy;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     protected $policies = [
         User::class => DashboardPolicy::class,
         Produk::class => ProdukPolicy::class,
-        Penjualan::class => PenjualanPolicy::class, // ✅ Ditambahkan
+        Penjualan::class => PenjualanPolicy::class,
         ItemPenjualan::class => ItemPenjualanPolicy::class,
     ];
 
@@ -43,5 +44,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrapFive();
+
+        // 2. Registrasikan seluruh array $policies ke Gate
+        foreach ($this->policies as $model => $policy) {
+            Gate::policy($model, $policy);
+        }
     }
 }
